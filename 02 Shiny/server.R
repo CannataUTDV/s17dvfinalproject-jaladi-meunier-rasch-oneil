@@ -8,44 +8,24 @@ require(readr)
 require(DT)
 
 
-df1 <- data.frame(query(
+dfs <- data.frame(query(
   data.world(propsfile = "www/.data.world"),
-  dataset="vcjaladi/s-17-dv-project-6", type="sql",
-  query="select AreaName, rep16_frac as RepPCT, dem16_frac as DemPCT
-  from electiondatabystate
-  where AreaName != 'Alaska'
-  order by AreaName"
-  ))
-
-df2 <- data.frame(query(
-  data.world(propsfile = "www/.data.world"),
-  dataset="uscensusbureau/acs-2015-5-e-income", type="sql",
-  query="select AreaName, sum(B19013_001) / 1000 as median_income
-        from USA_All_States
-        group by AreaName"))
-
-df3 <- data.frame(query(
-  data.world(propsfile = "www/.data.world"),
-  dataset="uscensusbureau/acs-2015-5-e-poverty", type="sql",
-  query="select AreaName, sum(B17001_002) / 1000 as numinpov
-         from USA_All_States
-         group by AreaName"))
-
-df4 <- data.frame(query(
-  data.world(propsfile = "www/.data.world"),
-  dataset="uscensusbureau/acs-2015-5-e-race", type="sql",
-  query="select AreaName, sum(B02001_002) / 1000 as sum_race
+  dataset="vcjaladi/s-17-dv-final-project", type="sql",
+  query="SELECT CountyElections.State, sum(CountyElections.`Total.Population`), sum(CountyElections.votes), sum(CountyElections.votes16_trumpd), sum(CountyElections.votes16_clintonh), sum(CountyElections.votes16_johnsong), sum(CountyElections.votes16_steinj),avg(CountyElections.rep16_frac) as RepPCT, avg(CountyElections.dem16_frac) as DemPCT, avg(CountyElections.`At.Least.Bachelor.s.Degree`), avg(CountyElections.`At.Least.High.School.Diploma`), avg(CountyElections.`Less.Than.High.School`),avg(CountyElections.`Graduate.Degree`), avg(CountyElections.`White.not.Latino.Population`), avg(CountyElections.`African.American.Population`),avg(CountyElections.`Native.American.Population`), avg(CountyElections.`Asian.American.Population`),avg(CountyElections.`Population.some.other.race.or.races`), avg(CountyElections.`Latino.Population`),avg(CountyElections.`Management.professional.and.related.occupations`), avg(CountyElections.`Service.occupations`),avg(CountyElections.`Sales.and.office.occupations`), avg(CountyElections.`Farming.fishing.and.forestry.occupations`),avg(CountyElections.`Construction.extraction.maintenance.and.repair.occupations`), avg(CountyElections.`Production.transportation.and.material.moving.occupations`), avg(CountyElections.`Adult.obesity`), avg(CountyElections.Diabetes), avg(CountyElections.Uninsured), avg(CountyElections.Unemployment), 
+Income.AreaName, sum(Income.B19013_001) / 1000 as median_income_thousands, 
+  Poverty.AreaName, sum(Poverty.B17001_002) / 1000 as numinpov_thousands, 
+  Race.AreaName, sum(Race.B02001_002) / 1000 as sum_white_thousands
   
-  from USA_All_States
-  group by AreaName"))
+  FROM `finalproject_ElectionsData.csv/finalproject_ElectionsData` CountyElections 
+  join uscensusbureau.`acs-2015-5-e-income`.`USA_All_States.csv/USA_All_States` Income ON (CountyElections.State = Income.AreaName)
+  join uscensusbureau.`acs-2015-5-e-poverty`.`USA_All_States.csv/USA_All_States` Poverty ON (CountyElections.State = Poverty.AreaName)
+  join uscensusbureau.`acs-2015-5-e-race`.`USA_All_States.csv/USA_All_States` Race ON (CountyElections.State = Race.AreaName)
+  WHERE CountyElections.State != 'Alaska'
+  GROUP BY CountyElections.State
+  ORDER BY CountyElections.State"
+))
 
-# Pairwise inner joins of dataframes
-print("Joining Data Frames")
-dfs <- dplyr::inner_join(df1,df2, by ="AreaName")
-dfs <- dplyr::inner_join(dfs,df3, by= "AreaName")
-dfs <- dplyr::inner_join(dfs,df4, by= "AreaName")
-
-#View(dfs)
+View(dfs)
 
 shinyServer(function(input, output) { 
   # These widgets are for the Crosstabs tab.
@@ -71,8 +51,8 @@ shinyServer(function(input, output) {
   output$plot1 <- renderPlot({ggplot(df_full()) +
     theme(axis.text.x=element_text(size=16, vjust=0.5)) +
     theme(axis.text.y=element_text(size=16, hjust=0.5)) +
-    geom_col(aes(x=AreaName, y=median_income, fill=victory_margin)) +
-    geom_text(aes(x=AreaName, y=median_income, label=median_income, hjust=-0.25)) +
+    geom_col(aes(x=AreaName, y=median_income_thousands, fill=victory_margin)) +
+    geom_text(aes(x=AreaName, y=median_income_thousands, label=median_income_thousands, hjust=-0.25)) +
     labs(title="Median Income for Each State by Election Victory Margin", y="Medium Income (Thousands USD)", x="State") +
     coord_flip()
 
@@ -80,16 +60,16 @@ shinyServer(function(input, output) {
   output$plot2 <- renderPlot({ggplot(df_full()) +
       theme(axis.text.x=element_text(size=16, vjust=0.5)) +
       theme(axis.text.y=element_text(size=16, hjust=0.5)) +
-      geom_col(aes(x=AreaName, y=numinpov, fill=victory_margin)) +
-      geom_text(aes(x=AreaName, y=numinpov, label=numinpov, hjust=-0.25)) +
+      geom_col(aes(x=AreaName, y=numinpov_thousands, fill=victory_margin)) +
+      geom_text(aes(x=AreaName, y=numinpov_thousands, label=numinpov_thousands, hjust=-0.25)) +
       labs(title="Population Below Poverty Line for Each State by Election Victory Margin", y="Citizens in Poverty (Thousands)", x="State") +
       coord_flip()
   })
   output$plot3 <- renderPlot({ggplot(df_full()) +
       theme(axis.text.x=element_text(size=16, vjust=0.5)) +
       theme(axis.text.y=element_text(size=16, hjust=0.5)) +
-      geom_col(aes(x=AreaName, y=sum_race, fill=victory_margin)) +
-      geom_text(aes(x=AreaName, y=sum_race, label=sum_race, hjust=-0.25)) +
+      geom_col(aes(x=AreaName, y=sum_white_thousands, fill=victory_margin)) +
+      geom_text(aes(x=AreaName, y=sum_white_thousands, label=sum_white_thousands, hjust=-0.25)) +
       labs(title="Population of Whites for Each State by Election Victory Margin", y="Citizens Identifying as White (Thousands)", x="State") +
       coord_flip()
 
