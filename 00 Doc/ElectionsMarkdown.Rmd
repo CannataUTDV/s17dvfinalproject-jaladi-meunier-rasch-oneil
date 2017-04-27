@@ -1,0 +1,61 @@
+---
+title: "Elections Data Analysis"
+author: "Justin Meunier, Varun Jaladi, Dylan Rasch, Sean O'neil"
+date: "April 24th, 2017"
+output:
+  html_document:
+    toc: yes
+  html_notebook:
+    toc: yes
+---
+
+#**Introduction**
+Our primary dataset includes electoral data, education demographics, ethnic distributions, economics, labor statistics, public health figures and crime rates for 3,100+ counties of the United States. The electoral data was collected by <a href="http://www.nytimes.com/elections/results/president">The New York Times</a> and the remaining columns were aggregated by The Ulster Institute for Social Research for a <a href="">publication</a> in the <i> Open Quantitative Sociology & Political Science</i> journal in 2016. Our analysis included the joining of the <a href="https://data.world/uscensusbureau">ACS 2015 Census Data</a> for Economics, Poverty and Race.
+
+To download the cleaned version of this data set, visit <a href="https://data.world/vcjaladi/s-17-dv-project-6">"S17 DV Project 6"</a> published by vcjaladi on data.world.
+
+#**R Configuration**
+Below we display our sessionInfo().
+
+```{r sessionInfo}
+sessionInfo(package=NULL)
+```
+
+#**The Data**
+
+```{r}
+source('../01 Data/DataImport.R')
+```
+
+#**The Visualizations**
+Median Incomes in Swing States by Victory Margin --
+
+This barchart shows a breakdown of the electoral swing states (created using a set), panelled by the victory margin they fall under. The bar represents the median income in that particular swing state. Each panel includes a reference line showing the average income for the particular victory margin. This visualization shows Hillary only won one swing state, New Hampshire, which has a higher median income than the other swing states. There isn't a panel for a Hillary Landslide victory, further showing that she performed poorly in swing states.
+
+![](../03\ Visualizations/Barchart1.png)</center>
+\n \n \n
+
+White Population By State and Victory Margin --
+
+This barchart shows the caucasian population in each state, colored by the victory margin of the candidates. There is an average line included that shows the average caucasian population among all states. 
+
+![](../03\ Visualizations/Barchart2.png)</center>
+\n \n \n
+
+Population Below Poverty Line By State and Victory Margin -- 
+
+This barchart shows the population below the poverty line in each state, colored by the victory margin of the candidates. 
+
+![](../03\ Visualizations/Barchart3.png)</center>
+\n \n \n
+
+
+#**The Shiny App**
+
+![](shinyscreenshot.png)</center>
+\n \n \n
+
+<a href= https://justinmeunier.shinyapps.io/electionsbarcharts/> Click here to visit the shiny application. </a>
+The above screenshot shows the Shiny application. Unlike the Tableau visualizations, the Shiny app shows state level statistics, and is not split by county, so there is only one "victory margin" per state.
+
+The sliders allow the user to change the margin of victory necessary for either candidate to have a "landslide" victory. Move the sliders and use the generate crosstabs button to refresh the plots.

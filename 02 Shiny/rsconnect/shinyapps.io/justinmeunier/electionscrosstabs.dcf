@@ -1,0 +1,10 @@
+name: electionscrosstabs
+title: ElectionsCrosstabs
+account: justinmeunier
+server: shinyapps.io
+appId: 172907
+bundleId: 792543
+url: https://justinmeunier.shinyapps.io/electionscrosstabs/
+when: 1492469298.02406
+asMultiple: FALSE
+asStatic: FALSE
