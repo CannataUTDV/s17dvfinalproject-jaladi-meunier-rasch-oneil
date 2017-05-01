@@ -6,7 +6,7 @@ require(shinydashboard)
 require(data.world)
 require(readr)
 require(DT)
-require("plotly")
+library(plotly)
 
 dfs <- data.frame(query(
   data.world(propsfile = "www/.data.world"),

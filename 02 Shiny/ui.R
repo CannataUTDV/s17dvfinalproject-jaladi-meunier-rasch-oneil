@@ -1,6 +1,7 @@
 #ui.R
 require(shiny)
 require(shinydashboard)
+library(plotly)
 
 dashboardPage(skin = "yellow",
   dashboardHeader(
