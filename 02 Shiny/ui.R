@@ -26,7 +26,7 @@ dashboardPage(
                                      min = .5, max = 1,  value = .75),
                          actionButton(inputId= "click1", label ="Generate Box Plot"),
                          hr(), # Add space after button.
-                         plotOutput("plot1", height=1000)
+                         plotlyOutput("plot1", height=1000)
                 ))
       ),
       # End Histogram tab content.
@@ -41,7 +41,7 @@ dashboardPage(
                                      min = .5, max = 1,  value = .75),
                          actionButton(inputId= "click2", label ="Generate Histogram"),
                          hr(), # Add space after button.
-                         plotOutput("plot2", height=1000)
+                         plotlyOutput("plot2", height=1000)
                 ))
       ),
       # End Histogram tab content.
@@ -56,7 +56,7 @@ dashboardPage(
                                      min = .5, max = 1,  value = .75),
                          actionButton(inputId= "click3", label ="Generate Scatter Plot"),
                          hr(), # Add space after button.
-                         plotOutput("plot3", height=1000)
+                         plotlyOutput("plot3", height=1000)
                 ))
       ),
       # End Scatterplot tab content.
@@ -71,7 +71,7 @@ dashboardPage(
                                      min = .5, max = 1,  value = .75),
                          actionButton(inputId= "click4", label ="Generate Crosstab"),
                          hr(), # Add space after button.
-                         plotOutput("plot4", height=1000)
+                         plotlyOutput("plot4", height=1000)
                 ))
       ),
       # End Crosstabs tab content.
