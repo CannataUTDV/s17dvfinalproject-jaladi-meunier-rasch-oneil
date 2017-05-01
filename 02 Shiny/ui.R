@@ -2,20 +2,29 @@
 require(shiny)
 require(shinydashboard)
 
-dashboardPage(
+dashboardPage(skin = "yellow",
   dashboardHeader(
   ),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Box Plots", tabName = "boxplot", icon = icon("dashboard")),
-      menuItem("Histograms", tabName = "histogram", icon = icon("dashboard")),
+      menuItem("Data", tabName = "data", icon = icon("dashboard")),
       menuItem("Scatter Plots", tabName = "scatter", icon = icon("dashboard")),
+      menuItem("Election Bar Charts", tabName = "barchart", icon = icon("dashboard")),
+      menuItem("Box Plots", tabName = "boxplot", icon = icon("dashboard")),
       menuItem("Crosstabs", tabName = "crosstab", icon = icon("dashboard")),
-      menuItem("Election Bar Charts", tabName = "barchart", icon = icon("dashboard"))
+      menuItem("Histograms", tabName = "histogram", icon = icon("dashboard"))
+      
     )
   ),
   dashboardBody(    
     tabItems(
+      # Begin Data tab content.
+      tabItem(tabName = "data",
+              tabsetPanel(
+                tabPanel("Data",  
+                         actionButton(inputId= "click0", label ="Show Data Table"),
+                         DT::dataTableOutput("Data1")))
+      ),
       # Begin Box Plot content.
       tabItem(tabName = "boxplot",
               tabsetPanel(
@@ -48,7 +57,12 @@ dashboardPage(
                 tabPanel("Data",  
                          actionButton(inputId= "click3", label ="Generate Scatter Plot"),
                          hr(), # Add space after button.
-                         plotOutput("plot3", height=1000)
+                         plotOutput("plot3", height=1000, 
+                                    click = "plot_click",
+                                    dblclick = "plot_dblclick",
+                                    hover = "plot_hover",
+                                    brush = "plot_brush"),
+                         plotOutput("plotZ")
                 ))
       ),
       # End Scatterplot tab content.
@@ -63,7 +77,7 @@ dashboardPage(
                                      min = .5, max = 1,  value = .75),
                          actionButton(inputId= "click4", label ="Generate Crosstab"),
                          hr(), # Add space after button.
-                         plotlyOutput("plot4", height=1000)
+                         plotlyOutput("plot4", height=1200)
                 ))
       ),
       # End Crosstabs tab content.

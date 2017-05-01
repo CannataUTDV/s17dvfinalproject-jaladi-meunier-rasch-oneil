@@ -37,7 +37,18 @@ shinyServer(function(input, output) {
   # These widgets are for the Box Plot tab.
   TVM <- reactive({input$TVM1})
   HVM <- reactive({input$HVM1})
-
+  
+# Begin Data Tab ------------------------------------------------------------------ 
+  df_dat <- eventReactive(input$click0, {
+    dfs %>% dplyr::mutate(voter_turnout= sum(votes/Total.Population))
+  })
+  
+  output$Data1 <- renderDataTable({DT::datatable(df_dat(),
+                                                 rownames = FALSE,
+                                                 extensions = list(Responsive = TRUE, FixedHeader = TRUE) )
+  })
+  
+  # End Data Tab ---------------------------------------------------------------------------
 # Begin Box Plot Tab ------------------------------------------------------------------ 
   
   # Parameterization 
@@ -112,7 +123,18 @@ shinyServer(function(input, output) {
       labs(title="Percentage of Democratic Voters vs. Percentage Uninsured", y="Democratic Voters (%)", x="Uninsured (%)")+ 
       scale_color_gradient(low="yellow", high="red")
   })
-  
+
+  output$plotZ <- renderPlot({
+    brush = brushOpts(id="plot_brush", delayType = "throttle", delay = 30)
+    bdf=brushedPoints(df_sp(), input$plot_brush)
+    if( !is.null(input$plot_brush) ) {
+      df_sp() %>% dplyr::filter(State %in% bdf[, "State"]) %>%
+    ggplot() + geom_col(aes(x=State, y=Uninsured, fill=poverty_ratio, size=4)) + guides(size=FALSE) + 
+        scale_fill_gradient(low="yellow",high="red")
+    }
+  })
+
+
   
 # End Scatterplot Tab ___________________________________________________________   
   
@@ -135,11 +157,11 @@ shinyServer(function(input, output) {
   # # output the plot
   output$plot4 <- renderPlotly({
     p<- ggplot(df_ct()) +
-      theme(axis.text.x=element_text(size=16, vjust=0.5)) +
-      theme(axis.text.y=element_text(size=16, hjust=0.5)) +
+      theme(axis.text.x=element_text(size=10, vjust=0.5)) +
+      theme(axis.text.y=element_text(size=10, hjust=0.5)) +
       geom_tile(aes(x=victory_margin, y=State, fill=median_income_thousands)) +
       geom_text(aes(x=victory_margin, y=State, label=median_income_thousands)) +
-      labs(title="Median Incomes by Victory Margin and Region", y="Region", x="Victory Type")
+      labs(title="Median Incomes by Victory Margin and Region", y="Region", x="Victory Type") 
     ggplotly(p)
   })
   
