@@ -6,7 +6,7 @@ require(shinydashboard)
 require(data.world)
 require(readr)
 require(DT)
-
+require("plotly")
 
 dfs <- data.frame(query(
   data.world(propsfile = "www/.data.world"),
@@ -34,11 +34,11 @@ swing_states <- c("Colorado","Florida","Iowa", "Michigan", "Minnesota", "Nevada"
 shinyServer(function(input, output) { 
   
   ### ADD UNIQUE WIDGETS FOR SLIDER TABS ###
-  # These widgets are for the Crosstabs tab.
+  # These widgets are for the Box Plot tab.
   TVM <- reactive({input$TVM1})
   HVM <- reactive({input$HVM1})
 
-# Begin Box Plot Tab ------------------------------------------------------------------ FIX COLOR SCHEME
+# Begin Box Plot Tab ------------------------------------------------------------------ 
   
   # Parameterization 
   df_bp <- eventReactive(input$click1, {
@@ -68,29 +68,21 @@ shinyServer(function(input, output) {
   # End Boxplot Tab ___________________________________________________________  
   
   
-# Begin Histogram Tab ------------------------------------------------------------------ REMOVE SLIDERS, FIX FILL
+# Begin Histogram Tab --------------------------------------------------------------
   
   # Parameterization 
   df_hg <- eventReactive(input$click2, {
     
-    dfs %>% dplyr::mutate(
-      victory_margin = if_else(RepPCT >0.5,
-                               (if_else(RepPCT > TVM(), 'Trump Landslide Victory',
-                                        'Trump Victory')
-                               ),
-                               if_else(DemPCT > HVM(),
-                                       'Hillary Landslide Victory',
-                                       'Hillary Victory')))%>% dplyr:: mutate(voter_turnout= mean(votes/Total.Population))
+    dfs %>% dplyr:: mutate(voter_turnout= sum(votes/Total.Population))
   })
-  
+
   # # output the plot
   output$plot2 <- renderPlotly({
     p<- ggplot(df_hg()) +
       theme(axis.text.x=element_text(size=16, vjust=0.5)) +
       theme(axis.text.y=element_text(size=16, hjust=0.5)) +
-      geom_histogram(aes(x=Less.Than.High.School, binwidth=1, fill=voter_turnout)) +
-      labs(title="Education Level Below High School", y="Count", x="% with Education Level Less than High School") +
-      scale_fill_distiller(palette = "Blues")
+      geom_histogram(aes(x=Less.Than.High.School, binwidth=1)) +
+      labs(title="States with Education Level Below High School", y="Count", x="% with Education Level Less than High School") 
     ggplotly(p)
   })
   
@@ -106,26 +98,19 @@ shinyServer(function(input, output) {
   df_sp <- eventReactive(input$click3, {
     
     dfs %>% dplyr::mutate(
-      victory_margin = if_else(RepPCT >0.5,
-                               (if_else(RepPCT > TVM(), 'Trump Landslide Victory',
-                                        'Trump Victory')
-                               ),
-                               if_else(DemPCT > HVM(),
-                                       'Hillary Landslide Victory',
-                                       'Hillary Victory')))
+      poverty_ratio = (numinpov_thousands * 1000) / Total.Population)
     
   })
   
   # # output the plot
-  output$plot3 <- renderPlotly({
-    p<- ggplot(df_sp()) +
+  output$plot3 <- renderPlot({
+    ggplot(df_sp()) +
       theme(axis.text.x=element_text(size=16, vjust=0.5)) +
       theme(axis.text.y=element_text(size=16, hjust=0.5)) +
-      geom_point(aes(x=Uninsured, y=DemPCT, color=numinpov_thousands)) +
-      geom_smooth(aes(x=Uninsured, y=DemPCT, method='loess')) +
+      geom_point(aes(x=Uninsured, y=DemPCT, color=poverty_ratio, size=poverty_ratio)) +
+      geom_smooth(aes(x=Uninsured, y=DemPCT)) +
       labs(title="Percentage of Democratic Voters vs. Percentage Uninsured", y="Democratic Voters (%)", x="Uninsured (%)")+ 
-      scale_color_distiller(palette="YlOrRd")
-    ggplotly(p)
+      scale_color_gradient(low="yellow", high="red")
   })
   
   
@@ -134,8 +119,7 @@ shinyServer(function(input, output) {
   
 
   
-# Begin Crosstab Tab ------------------------------------------------------------------ FIX LABEL AND ROUNDING ISSUE
-  
+# Begin Crosstab Tab ------------------------------------------------------------------ 
   # Parameterization 
   df_ct <- eventReactive(input$click4, {
     
@@ -146,16 +130,15 @@ shinyServer(function(input, output) {
                                ),
                                if_else(DemPCT > HVM(),
                                        'Hillary Landslide Victory',
-                                       'Hillary Victory')))
-  })
+                                       'Hillary Victory'))) %>% dplyr::group_by(Region)})
   
   # # output the plot
   output$plot4 <- renderPlotly({
     p<- ggplot(df_ct()) +
       theme(axis.text.x=element_text(size=16, vjust=0.5)) +
       theme(axis.text.y=element_text(size=16, hjust=0.5)) +
-      geom_tile(aes(x=victory_margin, y=Region, fill=median_income_thousands)) +
-      geom_text(aes(x=victory_margin, y=Region, label=median_income_thousands, hjust=-0.5)) +
+      geom_tile(aes(x=victory_margin, y=State, fill=median_income_thousands)) +
+      geom_text(aes(x=victory_margin, y=State, label=median_income_thousands)) +
       labs(title="Median Incomes by Victory Margin and Region", y="Region", x="Victory Type")
     ggplotly(p)
   })
@@ -190,7 +173,8 @@ shinyServer(function(input, output) {
     geom_text(aes(x=State, y=median_income_thousands, label=median_income_thousands, hjust=-0.25)) +
     geom_hline(aes(yintercept= mean(median_income_thousands))) +
     labs(title="Medium Income in the Swing States by Victor", y="Medium Income (Thousands USD)", x="State") +
-    coord_flip()
+    coord_flip() + 
+    scale_fill_brewer(palette="Set2")
   
   })
   

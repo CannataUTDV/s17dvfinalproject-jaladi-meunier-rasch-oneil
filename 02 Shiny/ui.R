@@ -35,10 +35,6 @@ dashboardPage(
       tabItem(tabName = "histogram",
               tabsetPanel(
                 tabPanel("Data",  
-                         sliderInput("TVM1", "Select Cutoff for Trump Landslide Victory:", 
-                                     min = .5, max = 1,  value = .75),
-                         sliderInput("HVM1", "Select Cutoff for Hillary Landslide Victory:", 
-                                     min = .5, max = 1,  value = .75),
                          actionButton(inputId= "click2", label ="Generate Histogram"),
                          hr(), # Add space after button.
                          plotlyOutput("plot2", height=1000)
@@ -50,13 +46,9 @@ dashboardPage(
       tabItem(tabName = "scatter",
               tabsetPanel(
                 tabPanel("Data",  
-                         sliderInput("TVM1", "Select Cutoff for Trump Landslide Victory:", 
-                                     min = .5, max = 1,  value = .75),
-                         sliderInput("HVM1", "Select Cutoff for Hillary Landslide Victory:", 
-                                     min = .5, max = 1,  value = .75),
                          actionButton(inputId= "click3", label ="Generate Scatter Plot"),
                          hr(), # Add space after button.
-                         plotlyOutput("plot3", height=1000)
+                         plotOutput("plot3", height=1000)
                 ))
       ),
       # End Scatterplot tab content.
