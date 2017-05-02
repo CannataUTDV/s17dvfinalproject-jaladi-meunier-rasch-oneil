@@ -6,11 +6,9 @@ output:
   html_document:
     toc: yes
     toc_float: yes
-    self_contained: no
   html_notebook:
     toc: yes
     toc_float: yes
-    self_contained: no
 ---
 
 #**Introduction**
