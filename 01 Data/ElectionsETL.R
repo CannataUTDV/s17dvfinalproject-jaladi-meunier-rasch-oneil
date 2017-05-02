@@ -6,7 +6,6 @@ file_path = "../01\ Data/finalproject_ElectionsData.csv"
 elections <- readr::read_csv(file_path)
 names(elections)
 
-# keep if rename columns df plyr::rename(hydropower, c("Resource Assessment Site ID"="Site ID"))
 df <- data.frame(elections)
 names(elections)
 
